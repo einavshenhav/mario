@@ -1,0 +1,5 @@
+.mypy_cache/
+*.pyc
+*.swp
+.vscode
+__pycache__/
