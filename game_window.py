@@ -1,5 +1,5 @@
 import arcade
-from views.game_view import GameView
+from platformer.views.game_view import GameView
 from platformer.constants import SCREEN_HEIGHT, SCREEN_TITLE, SCREEN_WIDTH
 
 class GameWindow(arcade.Window):
@@ -9,3 +9,5 @@ class GameWindow(arcade.Window):
         self.views = {}
 
         self.views["game_view"] = GameView()
+
+
