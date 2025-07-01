@@ -1,5 +1,5 @@
 import arcade
-from views.view import View
+from platformer.views.view import View
 from platformer.constants import TILE_SCALING, LAYER_NAME_GROUND
 
 class GameView(View):
