@@ -1,6 +1,6 @@
 import arcade
 from views.view import View
-from platformer.constants import TILE_SCALING
+from platformer.constants import TILE_SCALING, LAYER_NAME_GROUND
 
 class GameView(View):
     def __init__(self):
@@ -22,7 +22,7 @@ class GameView(View):
         # Doing this will make the SpriteList for the platforms layer
         # use spatial hashing for detection.
         layer_options = {
-            "Ground": {
+            LAYER_NAME_GROUND: {
                 "use_spatial_hash": True,
             },
         }
