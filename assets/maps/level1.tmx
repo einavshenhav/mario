@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="240" height="13" tilewidth="16" tileheight="16" infinite="0" nextlayerid="11" nextobjectid="155">
+ <tileset firstgid="1" name="tileset_gutter" tilewidth="16" tileheight="16" spacing="2" margin="1" tilecount="924" columns="33">
+  <image source="tileset_gutter.png" width="594" height="504"/>
+  <tile id="0">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="blocked" value=""/>
+    <property name="smashable" value=""/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="blocked" value=""/>
+    <property name="smashable" value=""/>
+   </properties>
+  </tile>
+  <tile id="24">
+   <properties>
+    <property name="blocked" value=""/>
+    <property name="coinblock" value=""/>
+   </properties>
+  </tile>
+  <tile id="25">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="33">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="264">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="265">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="266">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="267">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="268">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="297">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="298">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="299">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="300">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="301">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="330">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="331">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="363">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="364">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="925" source="tileset_gutter.tsx"/>
+ <layer id="2" name="Walls" width="240" height="13">
+  <data encoding="base64" compression="zlib">
+   eJztmMtugzAQRR12TfNYs2XZNum+/9nmT5J8XqcSlqaE8YwfASzuka6CBOPYjg+GOAcAAM59N879UC5Nfhu57QCQS7uZuwfTciXfbpS74B13U/LTtxFqB4Ap+FqZvxrcTfgJls6a/W3n7sCENEqka3PmKLZW6o8/1/ZZwy2166OxZn8BWCKdg78A1Ejn4C8ANTJ0N8ffHUvtDN/D/LsU/3wGLzS3W+P9MeZaKyXGJ9VK76mt4djSfsx3ejrhWGPoSkyth/9fkDLfY+7m+LunHCjHhL5wnrEul4I2tjc6924ce8y14JExBy3rf8wVa20pJHdT/f3bc08sOXtwjevSes/RxgZ/pyHkYMgByRWtNndP4vUhd1P9PfQ5s+NYXqndHWVf4bq0ugR/58fi4JgHIVe02tzfytdr7lqfH4Z4Zz9dur8f1L8T5VxgXW6Qh5SaG8xz+TlF/ucXxOEnoA==
+  </data>
+ </layer>
+ <layer id="10" name="Decoration" width="240" height="13">
+  <data encoding="base64" compression="zlib">
+   eJzt1FsOwiAQhWEemu5H3Ym6TXUnatsNCQ8khAQpl4Aj/5fwOufMpKoUACh1mJU66neay2eUzinJLs2VvgP9x3TWt7rodw3czL1r6LZ2xrc5KVK+h1h/d57UHeifrtb/unTuXWvddm9mrSzpO9A/P7NFFgAAAAAAAIDfc596NygnfQf6y9R775vOf+r3yOzRu78hfYfR+xu9d4hZdL/VedtUZ++U3M3LsfmvHT1S+y+BzFF3sJk+v3+qVv1j+ab/O/NbbvE7APBfPmB0Z0w=
+  </data>
+ </layer>
+</map>
