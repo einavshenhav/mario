@@ -9,3 +9,5 @@ class GameWindow(arcade.Window):
         self.views = {}
 
         self.views["game_view"] = GameView()
+
+
