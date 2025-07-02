@@ -1,8 +1,10 @@
 import arcade
 import math
 from platformer.views.view import View
-from platformer.constants import MAP_HEIGHT, ASPECT_RATIO, TILE_SCALING, LAYER_NAME_WALLS, PLAYER_START_X, PLAYER_START_Y, LAYER_NAME_PLAYER, PLAYER_MOVEMENT_SPEED, PLAYER_JUMP_SPEED
+from platformer.constants import MAP_HEIGHT, ASPECT_RATIO, TILE_SCALING, LAYER_NAME_WALLS, PLAYER_START_X, PLAYER_START_Y, LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, OBJECT_LAYER_NAME_BRICKS, TRIGGER_MARGIN, PLAYER_MOVEMENT_SPEED, PLAYER_JUMP_SPEED
 from platformer.entities.player import Player
+from platformer.entities.brick import BreakableBrick
+from platformer.entities.trigger import Trigger
 
 class GameView(View):
     def __init__(self):
@@ -28,7 +30,7 @@ class GameView(View):
         super().setup()
 
         # Name of map file to load
-        map_name = "assets/maps/level1.tmx"
+        map_name = "assets/maps/map1-1.tmx"
 
         # Layer specific options are defined based on Layer names in a dictionary
         # Doing this will make the SpriteList for the platforms layer
@@ -56,10 +58,31 @@ class GameView(View):
         )
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
 
+        self.scene.add_sprite_list(LAYER_NAME_BRICKS)
+        self.scene.add_sprite_list(LAYER_NAME_BRICK_TRIGGERS)
+
+        brick_layer = self.tile_map.object_lists[LAYER_NAME_BRICKS]
+        for object in brick_layer:
+            brick_type = object.type
+            if brick_type == "breakable_brick":
+                object_center_x = object.shape[0][0] + 4
+                object_center_y = object.shape[0][1] - 4
+
+                brick = BreakableBrick(center_x=object_center_x, center_y=object_center_y)
+                self.scene.add_sprite(LAYER_NAME_BRICKS, brick)
+                
+                brick_trigger = Trigger(brick,
+                                        "assets/images/sprites",
+                                        "trigger",
+                                        scale=TILE_SCALING,
+                                        center_x=object.shape[0][0] + 4, center_y=object.shape[0][1] - 4 - TRIGGER_MARGIN)
+                self.scene.add_sprite(LAYER_NAME_BRICK_TRIGGERS, brick_trigger)
+
+
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite,
             gravity_constant=0.5,
-            walls=self.scene["Walls"],
+            walls=[self.scene["Ground"], self.scene[LAYER_NAME_BRICKS]],
         )
 
         # Set up the camera
@@ -140,27 +163,34 @@ class GameView(View):
 
         self.process_keychange()
 
-    def update_animations(self, delta_time: float):
-        # Update Animations
-        self.scene.update_animation(
-            delta_time,
-            [
-                LAYER_NAME_PLAYER,
-            ],
-        )
 
-    def did_player_fall(self) -> bool: 
-        return self.player_sprite.center_y < -100
-
-    def on_update(self, delta_time: float):
+    def on_update(self, delta_time):
         if not self.started:
             self.setup()
 
         self.physics_engine.update()
 
-        self.update_animations(delta_time)
-        
-        if self.did_player_fall():
-            arcade.exit()
+        # Update Animations
+        self.scene.update_animation(
+            delta_time,
+            [
+                LAYER_NAME_PLAYER,
+                LAYER_NAME_BRICKS,
+            ],
+        )
 
         self.camera.position = arcade.Vec2(max(self.left_border,self.player_sprite.position[0]), self.camera.position[1])
+
+        # All collisions
+        player_collision_list = arcade.check_for_collision_with_list(
+            self.player_sprite,
+            self.scene[LAYER_NAME_BRICK_TRIGGERS],
+        )
+
+        # Check for collisions
+        for collision in player_collision_list:
+            if self.scene[LAYER_NAME_BRICK_TRIGGERS] in collision.sprite_lists:
+                if isinstance(collision.object, BreakableBrick):
+                    # Remove the block and the trigger from the scene
+                    self.scene[LAYER_NAME_BRICKS].remove(collision.object)
+                    self.scene[LAYER_NAME_BRICK_TRIGGERS].remove(collision)
