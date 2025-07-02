@@ -319,7 +319,10 @@ class GameView(View):
             if self.scene[LAYER_NAME_COINS] in collision.sprite_lists:
                 self.handle_coin_collision(collision)
             if self.scene[LAYER_NAME_ENEMIES] in collision.sprite_lists:
-                arcade.exit()
+                if self.player_sprite.center_y > collision.center_y + 1.5:
+                    self.scene[LAYER_NAME_ENEMIES].remove(collision)
+                else:
+                    arcade.exit()
         
         for enemy in self.scene[LAYER_NAME_ENEMIES]:
             if enemy.facing_direction == RIGHT_FACING:
