@@ -7,6 +7,8 @@ from platformer.entities.player import Player
 from platformer.entities.brick import BreakableBrick, SolidBrick, PointBrick
 from platformer.entities.coin import Coin
 from platformer.entities.trigger import Trigger
+arcade.resources.load_kenney_fonts()
+
 
 class GameView(View):
     def __init__(self):
@@ -28,6 +30,9 @@ class GameView(View):
 
         self.coins = 0
         self.points = 0
+
+        self.timer_text = None
+        self.text = f"MARIO {self.points}    coins x {self.coins}"
 
 
     def add_player(self):
@@ -52,14 +57,21 @@ class GameView(View):
 
             coin = Coin(center_x=object_center_x, center_y=object_center_y)
             self.scene.add_sprite(LAYER_NAME_COINS, coin)
+
+
+    def add_timer_text(self):
+        self.timer_text = arcade.create_text_sprite(
+            text=self.text,
+            font_name="Kenney Mini Square",
+            font_size=6
+        )
+        self.scene.add_sprite("Text", self.timer_text)
             
-        
-
-
         
     def setup(self):
         
         super().setup()
+
 
         # Name of map file to load
         map_name = "assets/maps/map1-1.tmx"
@@ -80,6 +92,8 @@ class GameView(View):
         # Initialize Scene with our TileMap, this will automatically add all layers
         # from the map as SpriteLists in the scene in the proper order.
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
+        
+        self.add_timer_text()
 
         self.add_coins()
 
@@ -174,7 +188,7 @@ class GameView(View):
         self.camera.use()
 
         # Draw scene
-        self.scene.draw()
+        self.scene.draw(pixelated=True)
 
 
     def process_keychange(self):
@@ -233,6 +247,7 @@ class GameView(View):
                 LAYER_NAME_COINS,
             ],
         )
+        self.timer_text.update_animation()
 
     def did_player_fall(self) -> bool: 
         return self.player_sprite.center_y < -100
@@ -256,7 +271,12 @@ class GameView(View):
             arcade.exit()
 
         self.camera.position = arcade.Vec2(max(self.left_border,self.player_sprite.position[0]), self.camera.position[1])
+        self.scene.remove_sprite_list_by_name("Text")
+        self.text = f"MARIO {self.points}    coins x {self.coins}"
+        self.add_timer_text()
+        self.timer_text.position = (self.camera.position[0], self.camera.position[1]+45)
 
+    
         # All collisions
         player_collision_list = arcade.check_for_collision_with_lists(
             self.player_sprite,
