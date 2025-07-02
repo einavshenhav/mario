@@ -164,12 +164,7 @@ class GameView(View):
         self.process_keychange()
 
 
-    def on_update(self, delta_time):
-        if not self.started:
-            self.setup()
-
-        self.physics_engine.update()
-
+    def update_animations(self, delta_time: float):
         # Update Animations
         self.scene.update_animation(
             delta_time,
@@ -178,6 +173,21 @@ class GameView(View):
                 LAYER_NAME_BRICKS,
             ],
         )
+
+    def did_player_fall(self) -> bool: 
+        return self.player_sprite.center_y < -100
+    
+    def on_update(self, delta_time):
+        if not self.started:
+            self.setup()
+
+        self.physics_engine.update()
+
+        # Update Animations
+        self.update_animations(delta_time)
+
+        if self.did_player_fall():
+            arcade.exit()
 
         self.camera.position = arcade.Vec2(max(self.left_border,self.player_sprite.position[0]), self.camera.position[1])
 
