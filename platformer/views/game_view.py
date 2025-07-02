@@ -1,9 +1,11 @@
 import arcade
 import math
 from platformer.views.view import View
-from platformer.constants import MAP_HEIGHT, ASPECT_RATIO, TILE_SCALING, LAYER_NAME_WALLS, PLAYER_START_X, PLAYER_START_Y, LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, OBJECT_LAYER_NAME_BRICKS, TRIGGER_MARGIN, PLAYER_MOVEMENT_SPEED, PLAYER_JUMP_SPEED
+from platformer.constants import MAP_HEIGHT, ASPECT_RATIO, TILE_SCALING, LAYER_NAME_WALLS, PLAYER_START_X, PLAYER_START_Y, PLAYER_MOVEMENT_SPEED, PLAYER_JUMP_SPEED
+from platformer.constants import LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, TRIGGER_MARGIN, LAYER_NAME_COINS
 from platformer.entities.player import Player
 from platformer.entities.brick import BreakableBrick, SolidBrick
+from platformer.entities.coin import Coin
 from platformer.entities.trigger import Trigger
 
 class GameView(View):
@@ -24,6 +26,32 @@ class GameView(View):
         self.right_pressed = False
         self.up_pressed = False
 
+        self.coins = 0
+
+
+    def add_player(self):
+         # Set up the player, specifically placing it at these coordinates.
+        self.player_sprite = Player()
+        self.player_sprite.center_x = (
+            self.tile_map.tiled_map.tile_size[0] * TILE_SCALING * PLAYER_START_X
+        )
+        self.player_sprite.center_y = (
+            self.tile_map.tiled_map.tile_size[1] * TILE_SCALING * PLAYER_START_Y
+        )
+        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
+
+
+    def add_coins(self):
+        self.scene.add_sprite_list(LAYER_NAME_COINS)
+
+        coin_layer = self.tile_map.object_lists[LAYER_NAME_COINS]
+        for object in coin_layer:
+            object_center_x = object.shape[0][0]
+            object_center_y = object.shape[0][1] - 2
+
+            coin = Coin(center_x=object_center_x, center_y=object_center_y)
+            self.scene.add_sprite(LAYER_NAME_COINS, coin)
+            
         
     def setup(self):
         
@@ -48,16 +76,10 @@ class GameView(View):
         # from the map as SpriteLists in the scene in the proper order.
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
 
-        # Set up the player, specifically placing it at these coordinates.
-        self.player_sprite = Player()
-        self.player_sprite.center_x = (
-            self.tile_map.tiled_map.tile_size[0] * TILE_SCALING * PLAYER_START_X
-        )
-        self.player_sprite.center_y = (
-            self.tile_map.tiled_map.tile_size[1] * TILE_SCALING * PLAYER_START_Y
-        )
-        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
+        self.add_coins()
 
+        self.add_player()
+       
         self.scene.add_sprite_list(LAYER_NAME_BRICKS)
         self.scene.add_sprite_list(LAYER_NAME_BRICK_TRIGGERS)
 
@@ -186,11 +208,18 @@ class GameView(View):
             [
                 LAYER_NAME_PLAYER,
                 LAYER_NAME_BRICKS,
+                LAYER_NAME_COINS,
             ],
         )
 
     def did_player_fall(self) -> bool: 
         return self.player_sprite.center_y < -100
+    
+
+    def handle_coin_collision(self, collision) -> None:
+        self.scene[LAYER_NAME_COINS].remove(collision)
+        self.coins += 1
+
     
     def on_update(self, delta_time):
         if not self.started:
@@ -207,9 +236,9 @@ class GameView(View):
         self.camera.position = arcade.Vec2(max(self.left_border,self.player_sprite.position[0]), self.camera.position[1])
 
         # All collisions
-        player_collision_list = arcade.check_for_collision_with_list(
+        player_collision_list = arcade.check_for_collision_with_lists(
             self.player_sprite,
-            self.scene[LAYER_NAME_BRICK_TRIGGERS],
+            [self.scene[LAYER_NAME_BRICK_TRIGGERS], self.scene[LAYER_NAME_COINS]],
         )
 
         # Check for collisions
@@ -223,3 +252,5 @@ class GameView(View):
                     # Change the texture of the brick
                     collision.object.texture = arcade.load_texture("assets/images/sprites/blocks/solid_brick.png")
                     self.scene[LAYER_NAME_BRICK_TRIGGERS].remove(collision)
+            elif self.scene[LAYER_NAME_COINS] in collision.sprite_lists:
+                self.handle_coin_collision(collision)
