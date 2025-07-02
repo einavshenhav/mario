@@ -3,7 +3,7 @@ import math
 from platformer.views.view import View
 from platformer.constants import MAP_HEIGHT, ASPECT_RATIO, TILE_SCALING, LAYER_NAME_WALLS, PLAYER_START_X, PLAYER_START_Y, LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, OBJECT_LAYER_NAME_BRICKS, TRIGGER_MARGIN, PLAYER_MOVEMENT_SPEED, PLAYER_JUMP_SPEED
 from platformer.entities.player import Player
-from platformer.entities.brick import BreakableBrick
+from platformer.entities.brick import BreakableBrick, SolidBrick
 from platformer.entities.trigger import Trigger
 
 class GameView(View):
@@ -75,9 +75,24 @@ class GameView(View):
                                         "assets/images/sprites",
                                         "trigger",
                                         scale=TILE_SCALING,
-                                        center_x=object.shape[0][0] + 4, center_y=object.shape[0][1] - 4 - TRIGGER_MARGIN)
+                                        center_x=object.shape[0][0] + 4,
+                                        center_y=object.shape[0][1] - 4 - TRIGGER_MARGIN)
                 self.scene.add_sprite(LAYER_NAME_BRICK_TRIGGERS, brick_trigger)
 
+            if brick_type == "solid_brick":
+                object_center_x = object.shape[0][0] + 4
+                object_center_y = object.shape[0][1] - 4
+
+                brick = SolidBrick(center_x=object_center_x, center_y=object_center_y)
+                self.scene.add_sprite(LAYER_NAME_BRICKS, brick)
+
+                brick_trigger = Trigger(brick,
+                                        "assets/images/sprites",
+                                        "trigger",
+                                        scale=TILE_SCALING,
+                                        center_x=object.shape[0][0] + 4,
+                                        center_y=object.shape[0][1] - 4 - TRIGGER_MARGIN)
+                self.scene.add_sprite(LAYER_NAME_BRICK_TRIGGERS, brick_trigger)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite,
@@ -193,4 +208,8 @@ class GameView(View):
                 if isinstance(collision.object, BreakableBrick):
                     # Remove the block and the trigger from the scene
                     self.scene[LAYER_NAME_BRICKS].remove(collision.object)
+                    self.scene[LAYER_NAME_BRICK_TRIGGERS].remove(collision)
+                if isinstance(collision.object, SolidBrick):
+                    # Change the texture of the brick
+                    collision.object.texture = arcade.load_texture("assets/images/sprites/blocks/solid_brick.png")
                     self.scene[LAYER_NAME_BRICK_TRIGGERS].remove(collision)
