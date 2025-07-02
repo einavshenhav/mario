@@ -14,7 +14,7 @@ def load_texture_pair(filename):
 
 
 class Entity(arcade.Sprite):
-    def __init__(self, folder, file_prefix):
+    def __init__(self, folder, file_prefix, moving_assets=2):
         super().__init__()
 
         # Default to facing right
@@ -30,7 +30,7 @@ class Entity(arcade.Sprite):
 
         # Load textures for walking
         self.walk_textures = []
-        for i in range(3):
+        for i in range(moving_assets):
             texture = load_texture_pair(f"{folder}/{file_prefix}_walk{i}.png")
             self.walk_textures.append(texture)
 

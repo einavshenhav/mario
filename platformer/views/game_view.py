@@ -2,8 +2,9 @@ import arcade
 import math
 from platformer.views.view import View
 from platformer.constants import MAP_HEIGHT, ASPECT_RATIO, TILE_SCALING, LAYER_NAME_WALLS, PLAYER_START_X, PLAYER_START_Y, PLAYER_MOVEMENT_SPEED, PLAYER_JUMP_SPEED
-from platformer.constants import LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, TRIGGER_MARGIN, LAYER_NAME_COINS, BLOCK_SIZE, DEFAULT_POINTS_PER_BRICK
+from platformer.constants import LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, LAYER_NAME_ENEMIES, TRIGGER_MARGIN, LAYER_NAME_COINS, BLOCK_SIZE, DEFAULT_POINTS_PER_BRICK, RIGHT_FACING
 from platformer.entities.player import Player
+from platformer.entities.goomba import Goomba
 from platformer.entities.brick import BreakableBrick, SolidBrick, PointBrick
 from platformer.entities.coin import Coin
 from platformer.entities.trigger import Trigger
@@ -39,10 +40,10 @@ class GameView(View):
          # Set up the player, specifically placing it at these coordinates.
         self.player_sprite = Player()
         self.player_sprite.center_x = (
-            self.tile_map.tiled_map.tile_size[0] * TILE_SCALING * PLAYER_START_X
+            BLOCK_SIZE * TILE_SCALING * PLAYER_START_X
         )
         self.player_sprite.center_y = (
-            self.tile_map.tiled_map.tile_size[1] * TILE_SCALING * PLAYER_START_Y
+            BLOCK_SIZE * TILE_SCALING * PLAYER_START_Y
         )
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
 
@@ -150,10 +151,22 @@ class GameView(View):
                                         center_y=object.shape[0][1] - 4 - TRIGGER_MARGIN)
                 self.scene.add_sprite(LAYER_NAME_BRICK_TRIGGERS, brick_trigger)
 
+        self.scene.add_sprite_list(LAYER_NAME_ENEMIES)
+
+        goomba_layer = self.tile_map.object_lists[LAYER_NAME_ENEMIES]
+        for object in goomba_layer:
+            enemy_type = object.type
+            if enemy_type == "goomba":
+                object_center_x = object.shape[0][0] + 4
+                object_center_y = object.shape[0][1] - 5.5
+
+                goomba = Goomba(object, object_center_x,object_center_y)
+                self.scene.add_sprite(LAYER_NAME_ENEMIES, goomba)
+
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite,
             gravity_constant=0.5,
-            walls=[self.scene["Ground"], self.scene[LAYER_NAME_BRICKS]],
+            walls=[self.scene[LAYER_NAME_WALLS], self.scene[LAYER_NAME_BRICKS]],
         )
 
         # Set up the camera
@@ -188,6 +201,7 @@ class GameView(View):
         self.camera.use()
 
         # Draw scene
+        self.scene.draw(pixelated=True)
         self.scene.draw(pixelated=True)
 
 
@@ -245,6 +259,7 @@ class GameView(View):
                 LAYER_NAME_PLAYER,
                 LAYER_NAME_BRICKS,
                 LAYER_NAME_COINS,
+                LAYER_NAME_ENEMIES,
             ],
         )
         self.timer_text.update_animation()
@@ -280,7 +295,7 @@ class GameView(View):
         # All collisions
         player_collision_list = arcade.check_for_collision_with_lists(
             self.player_sprite,
-            [self.scene[LAYER_NAME_BRICK_TRIGGERS], self.scene[LAYER_NAME_COINS]],
+            [self.scene[LAYER_NAME_BRICK_TRIGGERS], self.scene[LAYER_NAME_COINS], self.scene[LAYER_NAME_ENEMIES]],
         )
 
         # Check for collisions
@@ -301,5 +316,16 @@ class GameView(View):
                         self.scene[LAYER_NAME_BRICK_TRIGGERS].remove(collision)
                     else:
                         self.points += 100
-            elif self.scene[LAYER_NAME_COINS] in collision.sprite_lists:
+            if self.scene[LAYER_NAME_COINS] in collision.sprite_lists:
                 self.handle_coin_collision(collision)
+            if self.scene[LAYER_NAME_ENEMIES] in collision.sprite_lists:
+                arcade.exit()
+        
+        for enemy in self.scene[LAYER_NAME_ENEMIES]:
+            if enemy.facing_direction == RIGHT_FACING:
+
+                enemy.change_x += 1
+                #enemy.collision_sprite.change_x += 1
+            else:
+                enemy.change_x -= 1
+                #enemy.collision_sprite.change_x -= 1

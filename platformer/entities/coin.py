@@ -1,5 +1,5 @@
 import arcade
-from platformer.constants import COIN_SCALING, COIN_TEXTURE_DELAY
+from platformer.constants import COIN_SCALING, TEXTURE_DELAY
 from platformer.entities.entity import Entity
 
 class Coin(arcade.Sprite):
@@ -10,7 +10,7 @@ class Coin(arcade.Sprite):
         self.center_x = center_x
         self.center_y = center_y
         self.cur_texture_index = 0
-        self.texture_delay = COIN_TEXTURE_DELAY
+        self.texture_delay = TEXTURE_DELAY
         folder = "assets/images/sprites/coins"
         file_prefix = "coin"
 
@@ -27,7 +27,7 @@ class Coin(arcade.Sprite):
             if self.cur_texture_index > 3:
                 self.cur_texture_index = 0
             self.texture = self.textures[self.cur_texture_index]
-            self.texture_delay = COIN_TEXTURE_DELAY
+            self.texture_delay = TEXTURE_DELAY
         else:
             self.texture_delay -= 1
             
