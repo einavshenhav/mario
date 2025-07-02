@@ -5,9 +5,11 @@ from platformer.entities.entity import Entity
 
 class Brick(arcade.Sprite):
     """"""
-    def __init__(self, folder, file_prefix):
+    def __init__(self):
         super().__init__()
         self.scale = TILE_SCALING
+        folder = "assets/images/sprites/blocks/"
+        file_prefix = "brick"
         self.texture = arcade.load_texture(f"{folder}/{file_prefix}.png")
 
 
@@ -16,12 +18,16 @@ class BreakableBrick(Brick):
 
     def __init__(self, center_x=0, center_y=0):
 
-        folder = "assets/images/sprites/blocks/"
-        file_prefix = "brick"
-        super().__init__(folder, file_prefix)
-        self.texture = arcade.load_texture("assets/images/sprites/blocks/brick.png")
-
+        super().__init__()
         self.center_x = center_x
         self.center_y = center_y
-    
+
+
+class SolidBrick(Brick):
+    """"""
+
+    def __init__(self, center_x=0, center_y=0):
+        super().__init__()
+        self.center_x = center_x
+        self.center_y = center_y
 
