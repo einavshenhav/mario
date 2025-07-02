@@ -2,7 +2,7 @@ import arcade
 import math
 from platformer.views.view import View
 from platformer.constants import MAP_HEIGHT, ASPECT_RATIO, TILE_SCALING, LAYER_NAME_WALLS, PLAYER_START_X, PLAYER_START_Y, PLAYER_MOVEMENT_SPEED, PLAYER_JUMP_SPEED
-from platformer.constants import LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, TRIGGER_MARGIN, LAYER_NAME_COINS
+from platformer.constants import LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, TRIGGER_MARGIN, LAYER_NAME_COINS, BLOCK_SIZE
 from platformer.entities.player import Player
 from platformer.entities.brick import BreakableBrick, SolidBrick
 from platformer.entities.coin import Coin
@@ -25,6 +25,20 @@ class GameView(View):
         self.left_pressed = False
         self.right_pressed = False
         self.up_pressed = False
+        self.delta_count = 0
+
+        font = arcade.load_font("assets/fonts/NES_font.ttf")
+
+        self.timer_text = arcade.Text(
+            text="0",
+            x=3 * BLOCK_SIZE * TILE_SCALING,
+            y=11 * BLOCK_SIZE * TILE_SCALING,
+            color=arcade.color.WHITE,
+            font_size=5,
+            font_name=("assets/fonts/NES_font.ttf"),
+            anchor_x="center",
+            anchor_y="center",
+        )
 
         self.coins = 0
 
@@ -53,6 +67,9 @@ class GameView(View):
             self.scene.add_sprite(LAYER_NAME_COINS, coin)
             
         
+
+
+        
     def setup(self):
         
         super().setup()
@@ -70,7 +87,7 @@ class GameView(View):
         }
 
         # Read in the tiled map
-        self.tile_map = arcade.load_tilemap(map_name, TILE_SCALING, layer_options)
+        self.tile_map = arcade.load_tilemap(map_name, scaling=TILE_SCALING, layer_options=layer_options)
 
         # Initialize Scene with our TileMap, this will automatically add all layers
         # from the map as SpriteLists in the scene in the proper order.
@@ -135,6 +152,7 @@ class GameView(View):
         self.camera.viewport_width = self.window.width
         self.camera.viewport_height = self.window.height
 
+        # Get the left_border center_x for camera border to the left
         self.left_border = self.camera.position[0]
 
 
@@ -153,6 +171,8 @@ class GameView(View):
 
         # Draw scene
         self.scene.draw()
+
+        self.timer_text.draw()
 
 
     def process_keychange(self):
@@ -234,6 +254,10 @@ class GameView(View):
             arcade.exit()
 
         self.camera.position = arcade.Vec2(max(self.left_border,self.player_sprite.position[0]), self.camera.position[1])
+
+        self.delta_count += 1
+        if self.delta_count % 60 == 0:
+            self.timer_text.text = str(int(self.timer_text.text) + 1)
 
         # All collisions
         player_collision_list = arcade.check_for_collision_with_lists(
