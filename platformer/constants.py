@@ -6,6 +6,7 @@ SCREEN_TITLE = "Super XOR Bros"
 CHARACTER_SCALING = 0.25
 TILE_SCALING = 0.5
 COIN_SCALING = 0.15
+BLOCK_SIZE = 16 # in pixels
 MAP_HEIGHT = 13 # in blocks
 
 PLAYER_MOVEMENT_SPEED = 1
@@ -21,6 +22,8 @@ LAYER_NAME_BRICK_TRIGGERS = "Brick Triggers"
 
 # Object Layer names
 OBJECT_LAYER_NAME_BRICKS = "Bricks"
+
+DEFAULT_POINTS_PER_BRICK = 3 # 100 points each to a total of 300
 
 TRIGGER_MARGIN = 0.5
 

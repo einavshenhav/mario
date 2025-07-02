@@ -2,9 +2,9 @@ import arcade
 import math
 from platformer.views.view import View
 from platformer.constants import MAP_HEIGHT, ASPECT_RATIO, TILE_SCALING, LAYER_NAME_WALLS, PLAYER_START_X, PLAYER_START_Y, PLAYER_MOVEMENT_SPEED, PLAYER_JUMP_SPEED
-from platformer.constants import LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, TRIGGER_MARGIN, LAYER_NAME_COINS
+from platformer.constants import LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, TRIGGER_MARGIN, LAYER_NAME_COINS, BLOCK_SIZE, DEFAULT_POINTS_PER_BRICK
 from platformer.entities.player import Player
-from platformer.entities.brick import BreakableBrick, SolidBrick
+from platformer.entities.brick import BreakableBrick, SolidBrick, PointBrick
 from platformer.entities.coin import Coin
 from platformer.entities.trigger import Trigger
 
@@ -27,6 +27,7 @@ class GameView(View):
         self.up_pressed = False
 
         self.coins = 0
+        self.points = 0
 
 
     def add_player(self):
@@ -53,6 +54,9 @@ class GameView(View):
             self.scene.add_sprite(LAYER_NAME_COINS, coin)
             
         
+
+
+        
     def setup(self):
         
         super().setup()
@@ -70,7 +74,8 @@ class GameView(View):
         }
 
         # Read in the tiled map
-        self.tile_map = arcade.load_tilemap(map_name, TILE_SCALING, layer_options)
+        self.tile_map = arcade.load_tilemap(map_name, scaling=TILE_SCALING, layer_options=layer_options)
+        self.tile_map = arcade.load_tilemap(map_name, scaling=TILE_SCALING, layer_options=layer_options)
 
         # Initialize Scene with our TileMap, this will automatically add all layers
         # from the map as SpriteLists in the scene in the proper order.
@@ -115,6 +120,21 @@ class GameView(View):
                                         center_x=object.shape[0][0] + 4,
                                         center_y=object.shape[0][1] - 4 - TRIGGER_MARGIN)
                 self.scene.add_sprite(LAYER_NAME_BRICK_TRIGGERS, brick_trigger)
+            
+            if brick_type == "point_brick":
+                object_center_x = object.shape[0][0] + 4
+                object_center_y = object.shape[0][1] - 4
+
+                brick = PointBrick(DEFAULT_POINTS_PER_BRICK, center_x=object_center_x, center_y=object_center_y)
+                self.scene.add_sprite(LAYER_NAME_BRICKS, brick)
+
+                brick_trigger = Trigger(brick,
+                                        "assets/images/sprites",
+                                        "trigger",
+                                        scale=TILE_SCALING,
+                                        center_x=object.shape[0][0] + 4,
+                                        center_y=object.shape[0][1] - 4 - TRIGGER_MARGIN)
+                self.scene.add_sprite(LAYER_NAME_BRICK_TRIGGERS, brick_trigger)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite,
@@ -135,6 +155,8 @@ class GameView(View):
         self.camera.viewport_width = self.window.width
         self.camera.viewport_height = self.window.height
 
+        # Get the left_border center_x for camera border to the left
+        # Get the left_border center_x for camera border to the left
         self.left_border = self.camera.position[0]
 
 
@@ -248,9 +270,16 @@ class GameView(View):
                     # Remove the block and the trigger from the scene
                     self.scene[LAYER_NAME_BRICKS].remove(collision.object)
                     self.scene[LAYER_NAME_BRICK_TRIGGERS].remove(collision)
-                if isinstance(collision.object, SolidBrick):
+                elif isinstance(collision.object, SolidBrick):
                     # Change the texture of the brick
                     collision.object.texture = arcade.load_texture("assets/images/sprites/blocks/solid_brick.png")
                     self.scene[LAYER_NAME_BRICK_TRIGGERS].remove(collision)
+                elif isinstance(collision.object, PointBrick):
+                    collision.object.reduce_point()
+                    if collision.object.is_done():
+                        collision.object.texture = arcade.load_texture("assets/images/sprites/blocks/solid_brick.png")
+                        self.scene[LAYER_NAME_BRICK_TRIGGERS].remove(collision)
+                    else:
+                        self.points += 100
             elif self.scene[LAYER_NAME_COINS] in collision.sprite_lists:
                 self.handle_coin_collision(collision)
