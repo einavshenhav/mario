@@ -11,7 +11,7 @@ class Player(Entity):
         file_prefix = "mario"
 
         # Set up parent class
-        super().__init__(folder, file_prefix)
+        super().__init__(folder, file_prefix, moving_assets=3)
 
 
     def update_animation(self, delta_time: float = 1 / 60):
