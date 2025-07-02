@@ -2,7 +2,7 @@ import arcade
 import math
 from platformer.views.view import View
 from platformer.constants import MAP_HEIGHT, ASPECT_RATIO, TILE_SCALING, LAYER_NAME_WALLS, PLAYER_START_X, PLAYER_START_Y, PLAYER_MOVEMENT_SPEED, PLAYER_JUMP_SPEED
-from platformer.constants import LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, TRIGGER_MARGIN, LAYER_NAME_COINS, BLOCK_SIZE
+from platformer.constants import LAYER_NAME_PLAYER, LAYER_NAME_BRICKS, LAYER_NAME_BRICK_TRIGGERS, TRIGGER_MARGIN, LAYER_NAME_COINS, LAYER_NAME_FLAG, BLOCK_SIZE
 from platformer.entities.player import Player
 from platformer.entities.brick import BreakableBrick, SolidBrick
 from platformer.entities.coin import Coin
@@ -66,9 +66,10 @@ class GameView(View):
             coin = Coin(center_x=object_center_x, center_y=object_center_y)
             self.scene.add_sprite(LAYER_NAME_COINS, coin)
             
-        
-
-
+    def add_flag(self):
+        self.scene.add_sprite_list(LAYER_NAME_FLAG)
+        flag = Trigger("assets/images/sprites", "trigger", scale=TILE_SCALING)
+        self.scene.add_sprite(LAYER_NAME_FLAG, flag)
         
     def setup(self):
         
@@ -96,6 +97,9 @@ class GameView(View):
         self.add_coins()
 
         self.add_player()
+
+        self.add_flag()
+        print(self.scene[LAYER_NAME_FLAG])
        
         self.scene.add_sprite_list(LAYER_NAME_BRICKS)
         self.scene.add_sprite_list(LAYER_NAME_BRICK_TRIGGERS)
@@ -110,9 +114,9 @@ class GameView(View):
                 brick = BreakableBrick(center_x=object_center_x, center_y=object_center_y)
                 self.scene.add_sprite(LAYER_NAME_BRICKS, brick)
                 
-                brick_trigger = Trigger(brick,
-                                        "assets/images/sprites",
+                brick_trigger = Trigger("assets/images/sprites",
                                         "trigger",
+                                        object=brick,
                                         scale=TILE_SCALING,
                                         center_x=object.shape[0][0] + 4,
                                         center_y=object.shape[0][1] - 4 - TRIGGER_MARGIN)
@@ -125,9 +129,9 @@ class GameView(View):
                 brick = SolidBrick(center_x=object_center_x, center_y=object_center_y)
                 self.scene.add_sprite(LAYER_NAME_BRICKS, brick)
 
-                brick_trigger = Trigger(brick,
-                                        "assets/images/sprites",
+                brick_trigger = Trigger("assets/images/sprites",
                                         "trigger",
+                                        object=brick,
                                         scale=TILE_SCALING,
                                         center_x=object.shape[0][0] + 4,
                                         center_y=object.shape[0][1] - 4 - TRIGGER_MARGIN)
@@ -240,6 +244,9 @@ class GameView(View):
         self.scene[LAYER_NAME_COINS].remove(collision)
         self.coins += 1
 
+    def handle_flag_collision(self, flag) -> None:
+        arcade.exit()
+
     
     def on_update(self, delta_time):
         if not self.started:
@@ -267,6 +274,7 @@ class GameView(View):
 
         # Check for collisions
         for collision in player_collision_list:
+            print(player_collision_list)
             if self.scene[LAYER_NAME_BRICK_TRIGGERS] in collision.sprite_lists:
                 if isinstance(collision.object, BreakableBrick):
                     # Remove the block and the trigger from the scene
@@ -278,3 +286,6 @@ class GameView(View):
                     self.scene[LAYER_NAME_BRICK_TRIGGERS].remove(collision)
             elif self.scene[LAYER_NAME_COINS] in collision.sprite_lists:
                 self.handle_coin_collision(collision)
+            elif self.scene[LAYER_NAME_FLAG] in collision.sprite_lists:
+                print("hit flag")
+                self.handle_flag_collision()

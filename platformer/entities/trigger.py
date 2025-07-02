@@ -1,10 +1,10 @@
 import arcade
 import time
-from platformer.constants import TILE_SCALING, RIGHT_FACING
+from platformer.constants import TILE_SCALING
 
 class Trigger(arcade.Sprite):
     
-    def __init__(self, object, folder, file_prefix, scale=TILE_SCALING, center_x=0, center_y=0):
+    def __init__(self, folder, file_prefix, scale=TILE_SCALING, center_x=0, center_y=0, object=None):
         super().__init__()
         self.scale = scale
         self.object = object
