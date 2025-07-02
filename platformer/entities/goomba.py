@@ -5,14 +5,13 @@ from platformer.entities.entity import Entity
 class Goomba(Entity):
     """Goomba Sprite"""
 
-    def __init__(self, collision_sprite, center_x=0, center_y=0):
+    def __init__(self, center_x=0, center_y=0):
 
         folder = "assets/images/sprites/players/goomba"
         file_prefix = "goomba"
 
         # Set up parent class
         super().__init__(folder, file_prefix, moving_assets=2)
-        self.collision_sprite = collision_sprite
         self.texture_delay = TEXTURE_DELAY
         self.scale = 0.33
         self.center_x=center_x

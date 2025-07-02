@@ -160,7 +160,7 @@ class GameView(View):
                 object_center_x = object.shape[0][0] + 4
                 object_center_y = object.shape[0][1] - 5.5
 
-                goomba = Goomba(object, object_center_x,object_center_y)
+                goomba = Goomba(object_center_x,object_center_y)
                 self.scene.add_sprite(LAYER_NAME_ENEMIES, goomba)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(
@@ -325,7 +325,5 @@ class GameView(View):
             if enemy.facing_direction == RIGHT_FACING:
 
                 enemy.change_x += 1
-                #enemy.collision_sprite.change_x += 1
             else:
                 enemy.change_x -= 1
-                #enemy.collision_sprite.change_x -= 1
